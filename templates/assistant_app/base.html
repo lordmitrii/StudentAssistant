@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% block css_block %}
+    {% endblock %}
+    <title>{% block title %}Default Title{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <h1>Header: Student Assistant Site</h1>
+    </header>
+
+    <main>
+        Main body:
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>Footer: 2025 Student Assistant</p>
+    </footer>
+</body>
+</html>
