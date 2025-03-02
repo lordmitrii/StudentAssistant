@@ -14,6 +14,7 @@ This is a student assistant application build with django.
 - To work on the project, create a separate branch and push **only** to it.
 - If you are done with the feature/bugfix/other, you can make a pull request to `main` branch.
 - Before you push the changes, please update the requirements.txt if installed any new packages
+- When you work on the project, ensure that your branch is up-to-date with the main branch
 
 ## Instructions to run the project
 
