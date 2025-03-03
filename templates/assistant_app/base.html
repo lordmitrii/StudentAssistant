@@ -4,17 +4,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
     {% block css_block %}
     {% endblock %}
     <title>{% block title %}Default Title{% endblock %}</title>
 </head>
 <body>
     <header>
-        <h1>Header: Student Assistant Site</h1>
+        <h3>Student Assistant</h3>
+        <nav>
+            <a href="{% url 'assistant_app:home' %}">Home</a>
+                <a href="{% url 'assistant_app:courses'%}">MyCourses</a>
+                <a href="{% url 'assistant_app:calculator'%}">Grade Calculator</a>
+                <a href="{% url 'assistant_app:about'%}">About</a>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'assistant_app:account'%}">Account</a>
+            {% else %}
+                <a href="{% url 'assistant_app:login' %}">Log In</a>
+            {% endif %}
+        </nav>
     </header>
 
     <main>
-        Main body:
         {% block content %}{% endblock %}
     </main>
 
