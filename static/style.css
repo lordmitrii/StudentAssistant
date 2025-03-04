@@ -7,7 +7,7 @@ body {
     padding: 0;
 }
 
-header, footer {
+header {
     background-color: #000000;
     padding: 10px 20px;
     display: flex;
@@ -41,4 +41,13 @@ nav a {
 nav a:hover {
     background-color: white;
     color: black;
+}
+
+.custom-container {
+    margin-top: 20px;
+}
+
+.custom-outline {
+    border: 1px solid #000000;
+    border-radius: 4px;
 }

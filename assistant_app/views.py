@@ -48,7 +48,7 @@ def logout_view(request):
 def account_view(request):
     return render(request, 'assistant_app/account.html')
 
-def calculator_view(request):
+def calculator(request):
     if request.method == 'POST':
         form = CalculatorForm(request.POST)
         if form.is_valid():
@@ -61,10 +61,65 @@ def calculator_view(request):
         form = CalculatorForm()
     return render(request, 'assistant_app/calculator.html', {'form': form})
 
+
+"""This is a dummy thing to test the courses. Need to delete once we have the models ready"""
+class Course:
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+
+courses_list = [
+    Course(0, "ADS2 2007"),
+    Course(1, "WAD 2021"),
+    Course(2, "OOSE 2008"),
+]
+
 @login_required
-def courses_view(request):
-    courses_dict = [{"name": "ADS2 2007"},
-                    {"name": "WAD 2021"},
-                    {"name": "OOSE 2008"}]
-    
-    return render(request, 'assistant_app/courses.html', {'courses': courses_dict})
+def courses(request):
+    return render(request, 'assistant_app/courses.html', {'courses': courses_list})
+
+@login_required
+def add_course(request):
+    return render(request, 'assistant_app/add_course.html')
+
+@login_required
+def edit_course(request, course_id):
+    return render(request, 'assistant_app/edit_course.html', {'course_id': course_id})
+
+@login_required
+def delete_course(request, course_id):
+    """Need to edit the logic when we start using the models"""
+    global courses_list
+    course_to_delete = None
+    for course in courses_list:
+        if course.id == course_id:
+            course_to_delete = course
+            break
+    if course_to_delete:
+        courses_list.remove(course_to_delete)
+
+    return redirect('assistant_app:courses')
+
+@login_required
+def deadlines(request):
+    return render(request, 'assistant_app/deadlines.html')
+
+@login_required
+def add_deadline(request):
+    return render(request, 'assistant_app/add_deadline.html')
+
+@login_required
+def edit_deadline(request, deadline_id):
+    return render(request, 'assistant_app/edit_deadline.html', {'deadline_id': deadline_id})
+
+@login_required
+def grades(request):
+    return render(request, 'assistant_app/grades.html')
+
+@login_required
+def add_grade(request):
+    return render(request, 'assistant_app/add_grade.html')
+
+@login_required
+def edit_grade(request, grade_id):
+    return render(request, 'assistant_app/edit_grade.html', {'grade_id': grade_id})
