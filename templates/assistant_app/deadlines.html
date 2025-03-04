@@ -3,5 +3,9 @@
 {% block title %}About{% endblock %}
 
 {% block content %}
-    <p>All deadlines</p>
+    {% if course_id %}
+        <p>Deadlines for course {{ course_id }}</p>
+    {% else %}
+        <p>All deadlines</p>
+    {% endif %}
 {% endblock %}

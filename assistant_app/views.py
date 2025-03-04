@@ -69,9 +69,9 @@ class Course:
         self.name = name
 
 courses_list = [
-    Course(0, "ADS2 2007"),
-    Course(1, "WAD 2021"),
-    Course(2, "OOSE 2008"),
+    Course(1, "ADS2 2007"),
+    Course(2, "WAD 2021"),
+    Course(3, "OOSE 2008"),
 ]
 
 @login_required
@@ -100,26 +100,32 @@ def delete_course(request, course_id):
 
     return redirect('assistant_app:courses')
 
-@login_required
-def deadlines(request):
-    return render(request, 'assistant_app/deadlines.html')
 
 @login_required
-def add_deadline(request):
-    return render(request, 'assistant_app/add_deadline.html')
-
-@login_required
-def edit_deadline(request, deadline_id):
-    return render(request, 'assistant_app/edit_deadline.html', {'deadline_id': deadline_id})
-
-@login_required
-def grades(request):
+def grades(request, course_id=None):
+    if course_id:
+        return render(request, 'assistant_app/grades.html', {'course_id': course_id})
     return render(request, 'assistant_app/grades.html')
 
+
 @login_required
-def add_grade(request):
+def add_grade(request, course_id):
     return render(request, 'assistant_app/add_grade.html')
 
 @login_required
-def edit_grade(request, grade_id):
+def edit_grade(request, course_id, grade_id):
     return render(request, 'assistant_app/edit_grade.html', {'grade_id': grade_id})
+
+@login_required
+def deadlines(request, course_id=None):
+    if course_id:
+        return render(request, 'assistant_app/deadlines.html', {'course_id': course_id})
+    return render(request, 'assistant_app/deadlines.html')
+
+@login_required
+def add_deadline(request, course_id):
+    return render(request, 'assistant_app/add_deadline.html')
+
+@login_required
+def edit_deadline(request, course_id, deadline_id):
+    return render(request, 'assistant_app/edit_deadline.html', {'deadline_id': deadline_id})

@@ -17,8 +17,8 @@
       </div>
       <!-- My Grades and My Deadlines buttons -->
       <div class="col-md-4 text-center">
-        <a href="{% url 'assistant_app:grades' %}" class="btn btn-light custom-outline me-4">My Grades</a>
-        <a href="{% url 'assistant_app:deadlines' %}" class="btn btn-light custom-outline">My Deadlines</a>
+        <a href="{% url 'assistant_app:all_grades' %}" class="btn btn-light custom-outline me-4">View All Grades</a>
+        <a href="{% url 'assistant_app:all_deadlines' %}" class="btn btn-light custom-outline">View All Deadlines</a>
       </div>
       <!-- empty for layout balance -->
       <div class="col-md-4"></div>
@@ -38,6 +38,11 @@
               <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#coursesAccordion">
                 <div class="accordion-body">
                   Details about {{ course.name }}
+                  <p>Average Grade: 85%</p>
+                  <div class="d-flex gap-2">
+                    <a href="{% url 'assistant_app:grades_for_course' course.id %}" class="btn btn-sm btn-info">View Grades</a>
+                    <a href="{% url 'assistant_app:deadlines_for_course' course.id %}" class="btn btn-sm btn-info">View Deadlines</a>
+                  </div>
                   <div class="mt-3 d-flex gap-2">
                     <a href="{% url 'assistant_app:edit_course' course.id %}" class="btn btn-sm btn-warning">Edit</a>
                     <a href="{% url 'assistant_app:delete_course' course.id %}" class="btn btn-sm btn-danger">Delete</a>
