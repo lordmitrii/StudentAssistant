@@ -1,3 +1,53 @@
-h2 {
-    color: blue;
+html {
+    font-family: Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #000000;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+
+}
+
+footer {
+    background-color: #000000;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    border: 1px solid white;
+    border-radius: 4px;
+    margin-left: 10px;
+    transition: background-color 0.3s, color 0.3s;
+}
+nav a:hover {
+    background-color: white;
+    color: black;
+}
+
+.custom-container {
+    margin-top: 20px;
+}
+
+.custom-outline {
+    border: 1px solid #000000;
+    border-radius: 4px;
 }

@@ -1,0 +1,12 @@
+{% extends "assistant_app/base.html" %}
+
+{% block title %}Account{% endblock %}
+
+{% block content %}
+  <h2>Account</h2>
+  <p>Username: {{ user.username }}</p>
+  <p>Email: {{ user.email }}</p>
+  <p>Date Joined: {{ user.date_joined }}</p>
+  <p>Last Login: {{ user.last_login }}</p>
+  <p><a href="{% url 'assistant_app:logout' %}">Log Out</a></p>
+{% endblock %}

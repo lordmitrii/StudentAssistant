@@ -1,0 +1,11 @@
+{% extends "assistant_app/base.html" %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+    {% if course_id %}
+        <p>Grades for course {{ course_id }}</p>
+    {% else %}
+        <p>All grades</p>
+    {% endif %}
+{% endblock %}
