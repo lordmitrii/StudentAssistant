@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
-from .forms import RegistrationForm, CalculatorForm, CourseForm, GradeForm
+from .forms import RegistrationForm, CalculatorForm, CourseForm, GradeForm, AssignmentForm
 from django.contrib.auth.decorators import login_required
 from .models import Course, Grade, Assignment
 
@@ -193,7 +193,26 @@ def assignments(request, course_slug=None):
 
 @login_required
 def add_assignment(request, course_slug=None):
-    return render(request, 'assistant_app/add_assignment.html')
+    course = None
+    if course_slug:
+        course = get_object_or_404(Course, course_slug=course_slug, user=request.user)
+
+    if request.method == "POST":
+        form = AssignmentForm(request.POST, user=request.user, course_slug=course_slug)
+        if form.is_valid():
+            assignment = form.save(commit=False)
+            if course:
+                assignment.course = course
+            assignment.save()
+
+            if not course_slug:
+                return redirect('assistant_app:all_assignments')
+            
+            return redirect('assistant_app:assignments_for_course', course_slug=course.course_slug if course else form.cleaned_data['course'].course_slug)
+    else:
+        form = AssignmentForm(user=request.user, course_slug=course_slug)
+
+    return render(request, "assistant_app/add_assignment.html", {"form": form, "course": course})
 
 @login_required
 def edit_assignment(request, assignment_id, course_slug=None):
@@ -208,3 +227,9 @@ def delete_assignment(request, assignment_id, course_slug=None):
         return redirect('assistant_app:assignments_for_course', course_slug=course_slug)
     else:
         return redirect('assistant_app:all_assignments')
+    
+@login_required
+def get_assignments(request):
+    course_id = request.GET.get('course_id')
+    assignments = Assignment.objects.filter(course_id=course_id, graded=True).values('id', 'name')
+    return JsonResponse({'assignments': list(assignments)})

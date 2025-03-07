@@ -46,7 +46,7 @@ from .models import Grade, Course
 
 class GradeForm(forms.ModelForm):
     course = forms.ModelChoiceField(queryset=Course.objects.none(), label="Course")
-    assignment = forms.ModelChoiceField(queryset=Assignment.objects.none(), required=False, label="Assignment (Optional)")
+    assignment = forms.ModelChoiceField(queryset=Assignment.objects.none(), required=False, label="Assignment")
 
     class Meta:
         model = Grade
@@ -66,13 +66,53 @@ class GradeForm(forms.ModelForm):
         if course_slug:
             course = Course.objects.get(course_slug=course_slug, user=user)
             self.fields.pop('course')  # Remove course field since its already selected
-            self.fields['assignment'].queryset = Assignment.objects.filter(course=course)
+            self.fields['assignment'].queryset = Assignment.objects.filter(course=course, graded=True)
+            if not self.fields['assignment'].queryset.exists():
+                self.fields['assignment'].empty_label = "No Assignments Available"
+            else:
+                self.fields['assignment'].empty_label = "Select Assignment (Optional)"
         else:
             self.fields['course'].queryset = Course.objects.filter(user=user)
             self.fields['assignment'].widget.attrs.update({'class': 'form-control'})
             self.fields['course'].widget.attrs.update({'class': 'form-control'})
 
-        # If no assignments exist for the selected course, show 
-        self.fields['assignment'].empty_label = "No assignments available"
+            # If no assignments exist for the selected course, show 
+            if self.data.get('course'):
+                try:
+                    course_id = int(self.data.get('course'))
+                    self.fields['assignment'].queryset = Assignment.objects.filter(course_id=course_id)
+                except (ValueError, TypeError):
+                    self.fields['assignment'].queryset = Assignment.objects.none()
+            else:
+                self.fields['assignment'].queryset = Assignment.objects.none()
+
+
     
+
+class AssignmentForm(forms.ModelForm):
+    course = forms.ModelChoiceField(queryset=Course.objects.none(), label="Course")
+
+    class Meta:
+        model = Assignment
+        fields = ['course', 'name', "graded", 'deadline', 'note']
+        widgets = {
+            'deadline': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'note': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        course_slug = kwargs.pop('course_slug', None)
+        super().__init__(*args, **kwargs)
+
+        # If a course is provided, hide the course field
+        if course_slug:
+            self.fields.pop('course')  # Remove course field since its already selected
+        else:
+            self.fields['course'].queryset = Course.objects.filter(user=user)
+            self.fields['course'].widget.attrs.update({'class': 'form-control'})
+
+
+
 

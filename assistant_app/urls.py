@@ -44,4 +44,7 @@ urlpatterns = [
     path("courses/<slug:course_slug>/assignments/<int:assignment_id>/edit/", views.edit_assignment, name="edit_assignment_for_course"),
     path('courses/<slug:course_slug>/assignments/<int:assignment_id>/delete/', views.delete_assignment, name='delete_assignment_for_course'),
 
+
+    #Helpers for AJAX
+    path('ajax/get_assignments/', views.get_assignments, name='ajax_get_assignments'),
 ]

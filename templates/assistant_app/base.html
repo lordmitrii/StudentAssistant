@@ -12,7 +12,9 @@
 </head>
 <body>
     <header>
-        <h3>Student Assistant</h3>
+        <a href="{% url 'assistant_app:home' %}" class="text-decoration-none text-white">
+            <h3 class="fw-bold">Student Assistant</h3>
+        </a>
         <nav>
             <a href="{% url 'assistant_app:home' %}">Home</a>
                 <a href="{% url 'assistant_app:courses'%}">My Courses</a>
