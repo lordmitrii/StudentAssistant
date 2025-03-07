@@ -5,55 +5,55 @@
     <link rel="stylesheet" href="{% static 'style.css' %}">
 {% endblock %}
 
-{% block title %}Grades{% endblock %}
+{% block title %}Assignments{% endblock %}
 
 {% block content %}
-    {% if not all_grades_view %}
+    {% if not all_assignments_view %}
         <div class="container-fluid custom-container">
             <!-- Row for buttons -->
             <div class="row mb-3">
                 <div class="col-md-4 text-start">
-                    <a href="{% url 'assistant_app:add_grade_for_course' course_slug %}" class="btn btn-secondary">Add Grade</a>
+                    <a href="{% url 'assistant_app:add_assignment_for_course' course_slug %}" class="btn btn-secondary">Add Assignment</a>
                 </div>
                 <div class="col-md-8"></div>
             </div>
             <!-- Row for accordion -->
             <div class="row justify-content-start">
                 <div class="col-md-12">
-                    <div class="accordion" id="gradesAccordion">
-                        {% if course_grades %}
-                            {% for grade in course_grades %}
+                    <div class="accordion" id="assignmentsAccordion">
+                        {% if course_assignments %}
+                            {% for assignment in course_assignments %}
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="heading{{ forloop.counter }}">
                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
-                                            Grade: {{ grade.grade }} - {{ grade.date|date:"Y-m-d" }}
+                                            Assignment: {{ assignment.name }} - {{ assignment.deadline|date:"Y-m-d" }}
                                         </button>
                                     </h2>
-                                    <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#gradesAccordion">
+                                    <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#assignmentsAccordion">
                                         <div class="accordion-body">
-                                            <p>Note: {{ grade.note }}</p>
+                                            <p>Note: {{ assignment.note }}</p>
                                             <div class="mt-3 d-flex gap-2">
-                                                <a href="{% url 'assistant_app:edit_grade_for_course' course_slug grade.id %}" class="btn btn-sm btn-warning">Edit</a>
-                                                <a href="{% url 'assistant_app:delete_grade_for_course' course_slug grade.id %}" class="btn btn-sm btn-danger">Delete</a>
+                                                <a href="{% url 'assistant_app:edit_assignment_for_course' course_slug assignment.id %}" class="btn btn-sm btn-warning">Edit</a>
+                                                <a href="{% url 'assistant_app:delete_assignment_for_course' course_slug assignment.id %}" class="btn btn-sm btn-danger">Delete</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             {% endfor %}
                         {% else %}
-                            <p class="text-muted">No grades available for this course.</p>
+                            <p class="text-muted">No assignments available for this course.</p>
                         {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     {% else %}
-        {% if grades_by_course %}
+        {% if assignments_by_course %}
         <div class="container-fluid custom-container">
             <!-- Row for buttons -->
             <div class="row mb-3">
                 <div class="col-md-4 text-start">
-                    <a href="{% url 'assistant_app:add_grade' %}" class="btn btn-secondary">Add Grade</a>
+                    <a href="{% url 'assistant_app:add_assignment' %}" class="btn btn-secondary">Add Assignment</a>
                 </div>
                 <div class="col-md-4 text-center">
                     <a href="{% url 'assistant_app:courses' %}" class="btn btn-light custom-outline me-4">View All Courses</a>
@@ -62,28 +62,28 @@
                 <div class="col-md-4"></div>
             </div>
 
-            <!-- Show grades grouped by course -->
-                {% for course, grades in grades_by_course.items %}
+            <!-- Show assignments grouped by course -->
+                {% for course, assignments in assignments_by_course.items %}
                     <div class="card mb-3">
                         <div class="card-header">
                             <h5 class="mb-0">{{ course.course_name }}</h5>
                         </div>
                         <div class="card-body">
-                            {% if grades %}
-                                <div class="accordion" id="gradesAccordion{{ forloop.counter }}">
-                                    {% for grade in grades %}
+                            {% if assignments %}
+                                <div class="accordion" id="assignmentsAccordion{{ forloop.counter }}">
+                                    {% for assignment in assignments %}
                                         <div class="accordion-item">
                                             <h2 class="accordion-header" id="heading{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
                                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.parentloop.counter }}_{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
-                                                    Grade: {{ grade.grade }} - {{ grade.date|date:"Y-m-d" }}
+                                                    Assignment: {{ assignment.name }} - {{ assignment.deadline|date:"Y-m-d" }}
                                                 </button>
                                             </h2>
-                                            <div id="collapse{{ forloop.parentloop.counter }}_{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.parentloop.counter }}_{{ forloop.counter }}" data-bs-parent="#gradesAccordion{{ forloop.parentloop.counter }}">
+                                            <div id="collapse{{ forloop.parentloop.counter }}_{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.parentloop.counter }}_{{ forloop.counter }}" data-bs-parent="#assignmentsAccordion{{ forloop.parentloop.counter }}">
                                                 <div class="accordion-body">
-                                                    <p>Note: {{ grade.note }}</p>
+                                                    <p>Note: {{ assignment.note }}</p>
                                                     <div class="mt-3 d-flex gap-2">
-                                                        <a href="{% url 'assistant_app:edit_grade' grade.id %}" class="btn btn-sm btn-warning">Edit</a>
-                                                        <a href="{% url 'assistant_app:delete_grade' grade.id %}" class="btn btn-sm btn-danger">Delete</a>
+                                                        <a href="{% url 'assistant_app:edit_assignment' assignment.id %}" class="btn btn-sm btn-warning">Edit</a>
+                                                        <a href="{% url 'assistant_app:delete_assignment' assignment.id %}" class="btn btn-sm btn-danger">Delete</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -91,7 +91,7 @@
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                <p class="text-muted">No grades available for this course.</p>
+                                <p class="text-muted">No assignments available for this course.</p>
                             {% endif %}
                         </div>
                     </div>
@@ -107,7 +107,7 @@
                     </div>
                     <div class="col-md-4"></div>
                 </div>
-                <p class="text-muted">Add courses to view your grades.</p>
+                <p class="text-muted">Add courses to view your assignments.</p>
             </div>
             {% endif %}
         </div>

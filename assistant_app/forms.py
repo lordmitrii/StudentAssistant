@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import Course, Grade, Assignment
 
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True, help_text='Required. Enter a valid email address.')
@@ -25,3 +26,53 @@ class CalculatorForm(forms.Form):
     
     class Meta:
         fields = ("assignment", "grade", "weight")
+
+class CourseForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = ['course_name']
+        labels = {
+            'course_name': 'Course Name',
+        }
+        widgets = {
+            'course_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter course name'
+            }),
+        }
+
+from django import forms
+from .models import Grade, Course
+
+class GradeForm(forms.ModelForm):
+    course = forms.ModelChoiceField(queryset=Course.objects.none(), label="Course")
+    assignment = forms.ModelChoiceField(queryset=Assignment.objects.none(), required=False, label="Assignment (Optional)")
+
+    class Meta:
+        model = Grade
+        fields = ['course', 'assignment', 'grade', 'date', 'note']
+        widgets = {
+            'date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'note': forms.TextInput(attrs={'class': 'form-control'}),
+            'grade': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        course_slug = kwargs.pop('course_slug', None)
+        super().__init__(*args, **kwargs)
+
+        # If a course is provided, hide the course field
+        if course_slug:
+            course = Course.objects.get(course_slug=course_slug, user=user)
+            self.fields.pop('course')  # Remove course field since its already selected
+            self.fields['assignment'].queryset = Assignment.objects.filter(course=course)
+        else:
+            self.fields['course'].queryset = Course.objects.filter(user=user)
+            self.fields['assignment'].widget.attrs.update({'class': 'form-control'})
+            self.fields['course'].widget.attrs.update({'class': 'form-control'})
+
+        # If no assignments exist for the selected course, show 
+        self.fields['assignment'].empty_label = "No assignments available"
+    
+

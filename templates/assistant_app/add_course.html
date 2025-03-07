@@ -1,7 +1,11 @@
 {% extends "assistant_app/base.html" %}
 
-{% block title %}About{% endblock %}
+{% block title %}Add Course{% endblock %}
 
 {% block content %}
-    <p>Add course</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add</button>
+    </form>
 {% endblock %}
