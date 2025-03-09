@@ -15,7 +15,10 @@
                 <div class="col-md-4 text-start">
                     <a href="{% url 'assistant_app:add_grade_for_course' course_slug %}" class="btn btn-secondary">Add Grade</a>
                 </div>
-                <div class="col-md-8"></div>
+                <div class="col-md-4"></div>
+                <div class="col-md-4 text-end">
+                    <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
+                </div>
             </div>
             <!-- Row for accordion -->
             <div class="row justify-content-start">
@@ -26,11 +29,18 @@
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="heading{{ forloop.counter }}">
                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
-                                            Grade: {{ grade.grade }} - {{ grade.date|date:"Y-m-d" }}
+                                            <div class="col-md-6">
+                                                Grade: {{ grade.grade }}
+                                            </div>
+                                            <div class="col-md-5">
+                                                Date: {{ grade.date|date:"d/m/Y" }}
+                                            </div>
                                         </button>
                                     </h2>
                                     <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#gradesAccordion">
                                         <div class="accordion-body">
+                                            <p>Credits: {{ grade.credits }}</p>
+                                            <p>Assignment: {% if grade.assignment %}{{ grade.assignment.name }}{% else %}No assignment linked{% endif %}</p>
                                             <p>Note: {{ grade.note }}</p>
                                             <div class="mt-3 d-flex gap-2">
                                                 <a href="{% url 'assistant_app:edit_grade_for_course' course_slug grade.id %}" class="btn btn-sm btn-warning">Edit</a>
@@ -55,11 +65,10 @@
                 <div class="col-md-4 text-start">
                     <a href="{% url 'assistant_app:add_grade' %}" class="btn btn-secondary">Add Grade</a>
                 </div>
-                <div class="col-md-4 text-center">
-                    <a href="{% url 'assistant_app:courses' %}" class="btn btn-light custom-outline me-4">View All Courses</a>
-                    <a href="{% url 'assistant_app:all_assignments' %}" class="btn btn-light custom-outline">View All Assignments</a>
-                </div>
                 <div class="col-md-4"></div>
+                <div class="col-md-4 text-end">
+                    <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
+                </div>
             </div>
 
             <!-- Show grades grouped by course -->
@@ -75,11 +84,18 @@
                                         <div class="accordion-item">
                                             <h2 class="accordion-header" id="heading{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
                                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.parentloop.counter }}_{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
-                                                    Grade: {{ grade.grade }} - {{ grade.date|date:"Y-m-d" }}
+                                                    <div class="col-md-6">
+                                                        Grade: {{ grade.grade }}
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        Date: {{ grade.date|date:"d/m/Y" }}
+                                                    </div>
                                                 </button>
                                             </h2>
                                             <div id="collapse{{ forloop.parentloop.counter }}_{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.parentloop.counter }}_{{ forloop.counter }}" data-bs-parent="#gradesAccordion{{ forloop.parentloop.counter }}">
                                                 <div class="accordion-body">
+                                                    <p>Credits: {{ grade.credits }}</p>
+                                                    <p>Assignment: {% if grade.assignment %}{{ grade.assignment.name }}{% else %}No assignment linked{% endif %}</p>
                                                     <p>Note: {{ grade.note }}</p>
                                                     <div class="mt-3 d-flex gap-2">
                                                         <a href="{% url 'assistant_app:edit_grade' grade.id %}" class="btn btn-sm btn-warning">Edit</a>
@@ -101,11 +117,10 @@
                 <!-- Row for buttons -->
                 <div class="row mb-3">
                     <div class="col-md-4 text-start"></div>
-                    <div class="col-md-4 text-center">
-                        <a href="{% url 'assistant_app:courses' %}" class="btn btn-light custom-outline me-4">View All Courses</a>
-                        <a href="{% url 'assistant_app:all_assignments' %}" class="btn btn-light custom-outline">View All Assignments</a>
-                    </div>
                     <div class="col-md-4"></div>
+                    <div class="col-md-4 text-end">
+                        <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
+                    </div>
                 </div>
                 <p class="text-muted">Add courses to view your grades.</p>
             </div>

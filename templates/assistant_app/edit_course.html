@@ -3,9 +3,11 @@
 {% block title %}Edit Course{% endblock %}
 
 {% block content %}
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save Changes</button>
-    </form>
+    <div class="container mt-5">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Save Grade</button>
+        </form>
+    </div>
 {% endblock %}

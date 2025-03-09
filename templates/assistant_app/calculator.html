@@ -3,12 +3,14 @@
 {% block title %}Calculator{% endblock %}
 
 {% block content %}
-  <h2>Calculator</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Calculate</button>
-  </form>
-    <h3>Result: {{ result }}</h3>
-
+  <div class="container mt-5">
+    <div class="col-md-auto">
+      <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary">Save Grade</button>
+      </form>
+      <p class="font-weight-bolder">Result: {{ result }}</p>
+    </div>
+  </div>
 {% endblock %}

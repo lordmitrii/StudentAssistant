@@ -44,7 +44,11 @@
                 <button type="submit" class="btn btn-primary">Save Assignment</button>
             </div>  
             <div class="col-md-auto">
-                <a href="{% url 'assistant_app:all_assignments' %}" class="btn btn-secondary">Back to Assignments</a>
+                {% if course %}
+                    <a href="{% url 'assistant_app:assignments_for_course' course.course_slug %}" class="btn btn-secondary">Back to Course</a>
+                {% else %}
+                    <a href="{% url 'assistant_app:all_assignments' %}" class="btn btn-secondary">Back to Assignments</a>
+                {% endif %}
             </div>
         </div>
     </form>

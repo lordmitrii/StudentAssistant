@@ -22,10 +22,14 @@ class CalculatorForm(forms.Form):
     )
     assignment = forms.ChoiceField(choices=ASSIGNMENT_CHOICES, label='Assignment')
     grade = forms.FloatField(label='Grade')
-    weight = forms.FloatField(label='Weight')
+    credits = forms.IntegerField(label='Credits', initial=10)
     
     class Meta:
-        fields = ("assignment", "grade", "weight")
+        fields = ("assignment", "grade", "credits")
+        widgets = {
+            'grade': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter grade in percentage', 'min': 0, 'max': 100}),
+            'credits': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter credits'}),
+        }
 
 class CourseForm(forms.ModelForm):
     class Meta:
@@ -50,11 +54,12 @@ class GradeForm(forms.ModelForm):
 
     class Meta:
         model = Grade
-        fields = ['course', 'assignment', 'grade', 'date', 'note']
+        fields = ['course', 'assignment', 'grade', 'credits', 'date', 'note']
         widgets = {
-            'date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
             'note': forms.TextInput(attrs={'class': 'form-control'}),
-            'grade': forms.NumberInput(attrs={'class': 'form-control'}),
+            'grade': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter grades in percentage', 'min': 0, 'max': 100}),
+            'credits': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -66,7 +71,7 @@ class GradeForm(forms.ModelForm):
         if course_slug:
             course = Course.objects.get(course_slug=course_slug, user=user)
             self.fields.pop('course')  # Remove course field since its already selected
-            self.fields['assignment'].queryset = Assignment.objects.filter(course=course, graded=True)
+            self.fields['assignment'].queryset = Assignment.objects.filter(course=course, graded=True, grade=None)
             if not self.fields['assignment'].queryset.exists():
                 self.fields['assignment'].empty_label = "No Assignments Available"
             else:
@@ -76,15 +81,6 @@ class GradeForm(forms.ModelForm):
             self.fields['assignment'].widget.attrs.update({'class': 'form-control'})
             self.fields['course'].widget.attrs.update({'class': 'form-control'})
 
-            # If no assignments exist for the selected course, show 
-            if self.data.get('course'):
-                try:
-                    course_id = int(self.data.get('course'))
-                    self.fields['assignment'].queryset = Assignment.objects.filter(course_id=course_id)
-                except (ValueError, TypeError):
-                    self.fields['assignment'].queryset = Assignment.objects.none()
-            else:
-                self.fields['assignment'].queryset = Assignment.objects.none()
 
 
     
@@ -94,9 +90,10 @@ class AssignmentForm(forms.ModelForm):
 
     class Meta:
         model = Assignment
-        fields = ['course', 'name', "graded", 'deadline', 'note']
+        fields = ['course', 'name', 'graded', 'deadline', 'note']
         widgets = {
             'deadline': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'graded': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'note': forms.TextInput(attrs={'class': 'form-control'}),
         }

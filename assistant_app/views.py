@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, render
+from django.db.models import Sum, F, ExpressionWrapper, FloatField, Count, Q
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
@@ -55,17 +56,24 @@ def calculator(request):
         if form.is_valid():
             assignment = form.cleaned_data['assignment']
             grade = form.cleaned_data['grade']
-            weight = form.cleaned_data['weight']
-            result = grade * weight
+            credits = form.cleaned_data['credits']
+            result = grade * credits
         return render(request, 'assistant_app/calculator.html', {'form': form, 'result': result})
     else:
         form = CalculatorForm()
     return render(request, 'assistant_app/calculator.html', {'form': form})
 
 
-@login_required
 def courses(request):
-    courses = Course.objects.filter(user=request.user)
+    # Query to get all courses for the logged-in user and calculate the average grade using weights
+    courses = Course.objects.filter(user=request.user).annotate(
+        total_weighted_grades=Sum(F('grades__grade') * F('grades__credits'), output_field=FloatField()),
+        total_credits=Sum('grades__credits', output_field=FloatField()),
+        due_assignments=Count('assignments', filter=Q(assignments__is_done=False), distinct=True)
+    ).annotate(
+        average_grade=ExpressionWrapper((F('total_weighted_grades') / F('total_credits')), output_field=FloatField())
+    )
+
     return render(request, 'assistant_app/courses.html', {'courses': courses})
 
 @login_required
@@ -231,5 +239,6 @@ def delete_assignment(request, assignment_id, course_slug=None):
 @login_required
 def get_assignments(request):
     course_id = request.GET.get('course_id')
-    assignments = Assignment.objects.filter(course_id=course_id, graded=True).values('id', 'name')
+    assignments = Assignment.objects.filter(course_id=course_id, graded=True, grade=None).values('id', 'name')
     return JsonResponse({'assignments': list(assignments)})
+
