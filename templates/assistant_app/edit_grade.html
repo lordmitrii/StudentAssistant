@@ -1,7 +1,51 @@
 {% extends "assistant_app/base.html" %}
+{% load static %}
 
 {% block title %}Edit Grade{% endblock %}
 
 {% block content %}
-    <p>Edit grade</p>
+<div class="container mt-5">
+    <h2>Edit Grade</h2>
+
+    <form method="post">
+        {% csrf_token %}
+    
+
+        <div class="row d-flex justify-content-center mb-3">
+            <div class="col-md-6">
+                {{ form.grade.label_tag }}
+                {{ form.grade }}
+            </div>
+            <div class="col-md-6">
+                {{ form.credits.label_tag }}
+                {{ form.credits }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            {{ form.date.label_tag }}
+            {{ form.date }}
+        </div>
+        <div class="mb-3">
+            {{ form.note.label_tag }}
+            {{ form.note }}
+        </div>
+
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-primary">Save Grade</button>
+            </div>  
+            <div class="col-md-auto">
+                {% if course_slug %}
+                    <a href="{% url 'assistant_app:grades_for_course' course_slug %}" class="btn btn-secondary">Back to Course</a>
+                {% else %}
+                    <a href="{% url 'assistant_app:all_grades' %}" class="btn btn-secondary">Back to Grades</a>
+                {% endif %}
+            </div>
+        </div>
+        <!-- This is field is required to save the form. The course will be extracted from the previous grade on save -->
+        <div style="visibility: hidden;">{{ form.course }}</div>
+    </form>
+</div>
+
 {% endblock %}

@@ -13,7 +13,6 @@ def home(request):
     
     return render(request, "assistant_app/home.html", context=context_dict)
 
-@login_required
 def about(request):
     return render(request, "assistant_app/about.html")
 
@@ -49,7 +48,7 @@ def logout_view(request):
 @login_required
 def account_view(request):
     return render(request, 'assistant_app/account.html')
-
+   
 def calculator(request):
     if request.method == 'POST':
         form = CalculatorForm(request.POST)
@@ -63,7 +62,7 @@ def calculator(request):
         form = CalculatorForm()
     return render(request, 'assistant_app/calculator.html', {'form': form})
 
-
+@login_required
 def courses(request):
     # Query to get all courses for the logged-in user and calculate the average grade using weights
     courses = Course.objects.filter(user=request.user).annotate(
@@ -152,7 +151,6 @@ def add_grade(request, course_slug=None):
             assignment = form.cleaned_data.get('assignment')
             if assignment:
                 assignment.grade = grade
-                assignment.graded = True
                 assignment.save()
 
             if not course_slug:
@@ -166,7 +164,22 @@ def add_grade(request, course_slug=None):
 
 @login_required
 def edit_grade(request, grade_id, course_slug=None):
-    return render(request, 'assistant_app/edit_grade.html', {'grade_id': grade_id})
+    grade = get_object_or_404(Grade, id=grade_id)
+
+    if request.method == "POST":
+        form = GradeForm(request.POST, instance=grade, user=request.user, course_slug=course_slug)
+        if form.is_valid():
+            new_grade = form.save(commit=False)
+            new_grade.course = grade.course
+            new_grade.save()
+        if not course_slug:
+            return redirect('assistant_app:all_grades')
+        return redirect('assistant_app:grades_for_course', course_slug=grade.course.course_slug)
+    else:
+        form = GradeForm(instance=grade, user=request.user, course_slug=course_slug)
+
+    return render(request, 'assistant_app/edit_grade.html', {"form": form, "grade": grade, "course_slug": course_slug})
+
 
 @login_required
 def delete_grade(request, grade_id, course_slug=None):
@@ -224,7 +237,23 @@ def add_assignment(request, course_slug=None):
 
 @login_required
 def edit_assignment(request, assignment_id, course_slug=None):
-    return render(request, 'assistant_app/edit_assignment.html', {'assignment_id': assignment_id})
+    assignment = get_object_or_404(Assignment, id=assignment_id)
+
+    if request.method == "POST":
+        form = AssignmentForm(request.POST, instance=assignment, user=request.user, course_slug=course_slug)
+        if form.is_valid():
+            new_assignment = form.save(commit=False)
+            new_assignment.course = assignment.course
+            if new_assignment.graded == False:
+                new_assignment.grade = None
+            new_assignment.save()
+        if not course_slug:
+            return redirect('assistant_app:all_assignments')
+        return redirect('assistant_app:assignments_for_course', course_slug=assignment.course.course_slug)
+    else:
+        form = AssignmentForm(instance=assignment, user=request.user, course_slug=course_slug)
+
+    return render(request, 'assistant_app/edit_assignment.html', {"form": form, "assignment": assignment, "course_slug": course_slug})
 
 @login_required
 def delete_assignment(request, assignment_id, course_slug=None):

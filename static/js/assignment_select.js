@@ -4,6 +4,16 @@ document.addEventListener("DOMContentLoaded", function() {
     if (courseSelect) {
         courseSelect.addEventListener("change", function() {
             const courseId = this.value;
+
+            if (!courseId) {
+                assignmentSelect.innerHTML = "";
+                const emptyOption = document.createElement("option");
+                emptyOption.value = "";
+                emptyOption.text = "No Assignments Available";
+                assignmentSelect.appendChild(emptyOption);
+                return;
+            }
+
             fetch(`/ajax/get_assignments/?course_id=${courseId}`)
                 .then(response => response.json())
                 .then(data => {

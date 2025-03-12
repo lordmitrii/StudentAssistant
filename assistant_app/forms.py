@@ -45,8 +45,6 @@ class CourseForm(forms.ModelForm):
             }),
         }
 
-from django import forms
-from .models import Grade, Course
 
 class GradeForm(forms.ModelForm):
     course = forms.ModelChoiceField(queryset=Course.objects.none(), label="Course")
@@ -81,9 +79,25 @@ class GradeForm(forms.ModelForm):
             self.fields['assignment'].widget.attrs.update({'class': 'form-control'})
             self.fields['course'].widget.attrs.update({'class': 'form-control'})
 
+            # Dynamically update the queryset for assignments so that we dont get errors on saving
+            if self.data.get('course'):
+                try:
+                    course_id = int(self.data.get('course'))
+                    self.fields['assignment'].queryset = Assignment.objects.filter(course_id=course_id)
+                except (ValueError, TypeError):
+                    self.fields['assignment'].queryset = Assignment.objects.none()
+            else:
+                self.fields['assignment'].queryset = Assignment.objects.none()
 
+    def clean_assignment(self):
+        assignment = self.cleaned_data.get("assignment")
+        course = self.cleaned_data.get("course")
 
-    
+        if assignment and course and assignment.course_id != course.id:
+            raise forms.ValidationError("The selected assignment does not belong to the chosen course.")
+        
+        return assignment
+
 
 class AssignmentForm(forms.ModelForm):
     course = forms.ModelChoiceField(queryset=Course.objects.none(), label="Course")
