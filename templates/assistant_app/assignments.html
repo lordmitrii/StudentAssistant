@@ -1,0 +1,246 @@
+{% extends "assistant_app/base.html" %}
+{% load static %}
+
+{% block css_block %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+{% endblock %}
+
+{% block title %}Assignments{% endblock %}
+
+{% block content %}
+    {% if not all_assignments_view %}
+        <div class="container-fluid custom-container">
+            <!-- Row for buttons -->
+            <div class="row mb-3">
+                <div class="col-md-4 text-start">
+                    <a href="{% url 'assistant_app:add_assignment_for_course' course_slug %}" class="btn btn-secondary">Add Assignment</a>
+                </div>
+                <div class="col-md-4"></div>
+                <div class="col-md-4 text-end">
+                    <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
+                </div>
+            </div>
+            <!-- Row for accordion -->
+            <div class="row justify-content-start">
+                <div class="col-md-12">
+                    <div class="accordion" id="assignmentsAccordion">
+                        {% if course_assignments_pending or course_assignments_completed %}
+
+                            <!-- Pending assignments -->
+                            {% if course_assignments_pending %}
+                                <h3>Pending Assignments</h3>
+                                {% for assignment in course_assignments_pending %}
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                                                <div class="col-md-6">
+                                                    Assignment: {{ assignment.name }}
+                                                </div>
+                                                <div class="col-md-5">
+                                                    Deadline: {{ assignment.deadline|date:"d/m/Y" }}
+                                                </div>
+                                            </button>
+                                        </h2>
+                                        <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#assignmentsAccordion">
+                                            <div class="accordion-body">
+                                                <input type="checkbox" class="mark-done-checkbox" data-assignment-id="{{ assignment.id }}" {% if assignment.is_done %}checked{% endif %}>
+                                                <label>Mark as Done</label>
+                                                <p>Grade:
+                                                    {% if assignment.graded and assignment.grade %}
+                                                        {{ assignment.grade }}
+                                                    {% elif assignment.graded and not assignment.grade %}
+                                                        Not available yet
+                                                    {% else %}
+                                                        This assignment is not graded
+                                                    {% endif %}
+                                                </p>
+                                                <p>Note: {{ assignment.note }}</p>
+                                                <div class="mt-3 d-flex gap-2">
+                                                    <a href="{% url 'assistant_app:edit_assignment_for_course' course_slug assignment.id %}" class="btn btn-sm btn-warning">Edit</a>
+                                                    <a href="{% url 'assistant_app:delete_assignment_for_course' course_slug assignment.id %}" class="btn btn-sm btn-danger">Delete</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <!-- Completed Assignments -->
+                            {% if course_assignments_completed %}
+                            <h3 class="mt-3">Completed Assignments</h3>
+                            <div class="accordion" id="completedAssignmentsAccordion">
+                                {% for assignment in course_assignments_completed %}
+                                    {% if assignment.is_done %}
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="completedHeading{{ forloop.counter }}">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#completedCollapse{{ forloop.counter }}" aria-expanded="false" aria-controls="completedCollapse{{ forloop.counter }}">
+                                                <div class="col-md-6">
+                                                    Assignment: {{ assignment.name }}
+                                                </div>
+                                                <div class="col-md-5">
+                                                    Deadline: {{ assignment.deadline|date:"d/m/Y" }}
+                                                </div>
+                                            </button>
+                                        </h2>
+                                        <div id="completedCollapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="completedHeading{{ forloop.counter }}" data-bs-parent="#completedAssignmentsAccordion">
+                                            <div class="accordion-body">
+                                                <input type="checkbox" class="mark-done-checkbox" data-assignment-id="{{ assignment.id }}" {% if assignment.is_done %}checked{% endif %}>
+                                                <label>Mark as Done</label>
+                                                <p>Grade:
+                                                    {% if assignment.graded and assignment.grade %}
+                                                        {{ assignment.grade }}
+                                                    {% elif assignment.graded and not assignment.grade %}
+                                                        Not available yet
+                                                    {% else %}
+                                                        This assignment is not graded
+                                                    {% endif %}
+                                                </p>
+                                                <p>Note: {{ assignment.note }}</p>
+                                                <div class="mt-3 d-flex gap-2">
+                                                    <a href="{% url 'assistant_app:edit_assignment_for_course' course_slug assignment.id %}" class="btn btn-sm btn-warning">Edit</a>
+                                                    <a href="{% url 'assistant_app:delete_assignment_for_course' course_slug assignment.id %}" class="btn btn-sm btn-danger">Delete</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        {% else %}
+                            <p class="text-muted">No assignments available for this course.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        {% if assignments_by_course %}
+        <div class="container-fluid custom-container">
+            <!-- Row for buttons -->
+            <div class="row mb-3">
+                <div class="col-md-4 text-start">
+                    <a href="{% url 'assistant_app:add_assignment' %}" class="btn btn-secondary">Add Assignment</a>
+                </div>
+                <div class="col-md-4"></div>
+                <div class="col-md-4 text-end">
+                    <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
+                </div>
+            </div>
+
+            <!-- Show assignments grouped by course -->
+            {% for course, assignments in assignments_by_course.items %}
+                {% if assignments %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ course.course_name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="assignmentsAccordion{{ forloop.counter }}">
+                            {% for assignment in assignments %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.parentloop.counter }}_{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
+                                            <div class="col-md-6">
+                                                Assignment: {{ assignment.name }}
+                                            </div>
+                                            <div class="col-md-5">
+                                                Deadline: {{ assignment.deadline|date:"d/m/Y" }}
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{ forloop.parentloop.counter }}_{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.parentloop.counter }}_{{ forloop.counter }}" data-bs-parent="#assignmentsAccordion{{ forloop.parentloop.counter }}">
+                                        <div class="accordion-body">
+                                            <input type="checkbox" class="mark-done-checkbox" data-assignment-id="{{ assignment.id }}" {% if assignment.is_done %}checked{% endif %}>
+                                            <label>Mark as Done</label>
+                                            <p>Grade:
+                                                {% if assignment.graded and assignment.grade %}
+                                                    {{ assignment.grade }}
+                                                {% elif assignment.graded and not assignment.grade %}
+                                                    Not available yet
+                                                {% else %}
+                                                    This assignment is not graded
+                                                {% endif %}
+                                            </p>
+                                            <p>Note: {{ assignment.note }}</p>
+                                            <div class="mt-3 d-flex gap-2">
+                                                <a href="{% url 'assistant_app:edit_assignment' assignment.id %}" class="btn btn-sm btn-warning">Edit</a>
+                                                <a href="{% url 'assistant_app:delete_assignment' assignment.id %}" class="btn btn-sm btn-danger">Delete</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+            {% if completed_assignments %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">Completed Assignments</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="allCompletedAssignmentsAccordion">
+                            {% for assignment in completed_assignments %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="completedHeadingAll{{ forloop.counter }}">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#completedCollapseAll{{ forloop.counter }}" aria-expanded="false" aria-controls="completedCollapseAll{{ forloop.counter }}">
+                                            <div class="col-md-6">
+                                                Assignment: {{ assignment.name }}
+                                            </div>
+                                            <div class="col-md-5">
+                                                Deadline: {{ assignment.deadline|date:"d/m/Y" }} 
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="completedCollapseAll{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="completedHeadingAll{{ forloop.counter }}" data-bs-parent="#allCompletedAssignmentsAccordion">
+                                        <div class="accordion-body">
+                                            <input type="checkbox" class="mark-done-checkbox" data-assignment-id="{{ assignment.id }}" {% if assignment.is_done %}checked{% endif %}>
+                                            <label>Mark as Done</label>
+                                            <p>Course: {{ assignment.course.course_name }}</p>
+                                            <p>Grade:
+                                                {% if assignment.graded and assignment.grade %}
+                                                    {{ assignment.grade }}
+                                                {% elif assignment.graded and not assignment.grade %}
+                                                    Not available yet
+                                                {% else %}
+                                                    This assignment is not graded
+                                                {% endif %}
+                                            </p>
+                                            <p>Note: {{ assignment.note }}</p>
+                                            <div class="mt-3 d-flex gap-2">
+                                                <a href="{% url 'assistant_app:edit_assignment' assignment.id %}" class="btn btn-sm btn-warning">Edit</a>
+                                                <a href="{% url 'assistant_app:delete_assignment' assignment.id %}" class="btn btn-sm btn-danger">Delete</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+        {% else %}
+            <div class="container-fluid custom-container">
+                <!-- Row for buttons -->
+                <div class="row mb-3">
+                    <div class="col-md-4 text-start">
+                        <a href="{% url 'assistant_app:add_assignment' %}" class="btn btn-secondary">Add Assignment</a>
+                    </div>
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4 text-end">
+                        <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
+                    </div>
+                </div>
+                <p class="text-muted">No assignments available.</p>
+            </div>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block js_block %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <script src="{% static 'js/mark_assignment.js' %}"></script>
+{% endblock %}

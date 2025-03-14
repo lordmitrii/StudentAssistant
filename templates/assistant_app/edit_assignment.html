@@ -1,0 +1,53 @@
+{% extends "assistant_app/base.html" %}
+{% load static %}
+
+{% block title %}Edit Assignment{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit Assignment</h2>
+
+    <form method="post">
+        {% csrf_token %}
+    
+
+        <div class="mb-3">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.graded.label_tag }}
+            {{ form.graded }}
+        </div>
+        <div class="mb-3">
+            {{ form.grade.label_tag }}
+            {{ form.grade }}
+        </div>
+        <div class="mb-3">
+            {{ form.deadline.label_tag }}
+            {{ form.deadline }}
+        </div>
+        <div class="mb-3">
+            {{ form.note.label_tag }}
+            {{ form.note }}
+        </div>
+
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-primary">Save Assignment</button>
+            </div>  
+            <div class="col-md-auto">
+                {% if course_slug %}
+                    <a href="{% url 'assistant_app:assignments_for_course' course_slug %}" class="btn btn-secondary">Back to Course</a>
+                {% else %}
+                    <a href="{% url 'assistant_app:all_assignments' %}" class="btn btn-secondary">Back to Assignments</a>
+                {% endif %}
+            </div>
+        </div>
+        <!-- This is field is required to save the form. The course will be extracted from the previous assignment on save -->
+        <div style="visibility: hidden;">{{ form.course }}</div>
+    </form>
+</div>
+
+{% endblock %}

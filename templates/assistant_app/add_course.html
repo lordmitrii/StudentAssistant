@@ -1,7 +1,13 @@
 {% extends "assistant_app/base.html" %}
 
-{% block title %}About{% endblock %}
+{% block title %}Add Course{% endblock %}
 
 {% block content %}
-    <p>Add course</p>
+    <div class="container mt-5">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Save Grade</button>
+        </form>
+    </div>
 {% endblock %}
