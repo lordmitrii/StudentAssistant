@@ -27,7 +27,7 @@ class Course(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.course_name
+        return f"{self.id} - {self.course_name}"
     
 
 

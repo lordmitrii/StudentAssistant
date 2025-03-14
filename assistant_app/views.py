@@ -126,8 +126,18 @@ def grades(request, course_slug=None):
         })
     
     else:
+        grades_exist = False
+        grades_by_course = {}
         courses = Course.objects.filter(user=request.user)
-        grades_by_course = {course: Grade.objects.filter(course=course) for course in courses}
+        
+        for course in courses:
+            if course.grades.exists():
+                grades_exist = True
+                break
+
+        if grades_exist:
+            for course in courses:
+                grades_by_course[course] = Grade.objects.filter(course=course)
 
         return render(request, 'assistant_app/grades.html', {
             'grades_by_course': grades_by_course,
@@ -195,20 +205,35 @@ def delete_grade(request, grade_id, course_slug=None):
 def assignments(request, course_slug=None):
     if course_slug:
         course = get_object_or_404(Course, course_slug=course_slug, user=request.user)
-        course_assignments = Assignment.objects.filter(course=course)
+        course_assignments_pending = Assignment.objects.filter(course=course, is_done=False)
+        course_assignments_completed = Assignment.objects.filter(course=course, is_done=True)
         return render(request, 'assistant_app/assignments.html', {
             'course_slug': course_slug,
             'course': course,
-            'course_assignments': course_assignments,
+            'course_assignments_pending': course_assignments_pending,
+            'course_assignments_completed': course_assignments_completed,
             'all_assignments_view': False
         })
     
     else:
+        assignments_exists = False
+        assignments_by_course = {}
+        completed_assignments = []
         courses = Course.objects.filter(user=request.user)
-        assignments_by_course = {course: Assignment.objects.filter(course=course) for course in courses}
+
+        for course in courses:
+            if course.assignments.exists():
+                assignments_exists = True
+                break
+        
+        if assignments_exists:
+            for course in courses:
+                assignments_by_course[course] = Assignment.objects.filter(course=course, is_done=False)
+                completed_assignments.extend(Assignment.objects.filter(course=course, is_done=True))
 
         return render(request, 'assistant_app/assignments.html', {
             'assignments_by_course': assignments_by_course,
+            'completed_assignments' : completed_assignments,
             'all_assignments_view': True
         })
 
@@ -271,3 +296,9 @@ def get_assignments(request):
     assignments = Assignment.objects.filter(course_id=course_id, graded=True, grade=None).values('id', 'name')
     return JsonResponse({'assignments': list(assignments)})
 
+@login_required
+def mark_assignment_complete(request, assignment_id):
+    assignment = get_object_or_404(Assignment, id=assignment_id, course__user=request.user)
+    assignment.is_done = not assignment.is_done  # Toggle the status
+    assignment.save()
+    return JsonResponse({'status': 'success', 'is_done': assignment.is_done})

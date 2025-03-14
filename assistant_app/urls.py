@@ -47,4 +47,6 @@ urlpatterns = [
 
     #Helpers for AJAX
     path('ajax/get_assignments/', views.get_assignments, name='ajax_get_assignments'),
+    path("ajax/assignments/<int:assignment_id>/complete/", views.mark_assignment_complete, name="ajax_assignment_complete"),
+
 ]
