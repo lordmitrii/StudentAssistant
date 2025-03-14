@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render
-from django.db.models import Sum, F, ExpressionWrapper, FloatField, Count, Q
+from django.db.models import Sum, F, ExpressionWrapper, FloatField, Count, Q, Avg
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
@@ -64,7 +64,7 @@ def calculator(request):
 
 @login_required
 def courses(request):
-    # Query to get all courses for the logged-in user and calculate the average grade using weights
+    # Query to get all courses for the user and calculate the average grade using weights
     courses = Course.objects.filter(user=request.user).annotate(
         total_weighted_grades=Sum(F('grades__grade') * F('grades__credits'), output_field=FloatField()),
         total_credits=Sum('grades__credits', output_field=FloatField()),
@@ -118,10 +118,20 @@ def grades(request, course_slug=None):
     if course_slug:
         course = get_object_or_404(Course, course_slug=course_slug, user=request.user)
         course_grades = Grade.objects.filter(course=course)
+        average_grade = course_grades.aggregate(
+            total_weighted_grades=Sum(F('grade') * F('credits'), output_field=FloatField()),
+            total_credits=Sum('credits', output_field=FloatField())
+        )
+        if average_grade['total_credits']:
+            course_average = average_grade['total_weighted_grades'] / average_grade['total_credits']
+        else:
+            course_average = None
+
         return render(request, 'assistant_app/grades.html', {
             'course_slug': course_slug,
             'course': course,
             'course_grades': course_grades,
+            'course_average_grade': course_average,
             'all_grades_view': False
         })
     
@@ -129,6 +139,14 @@ def grades(request, course_slug=None):
         grades_exist = False
         grades_by_course = {}
         courses = Course.objects.filter(user=request.user)
+        average_grade = Grade.objects.filter(course__user=request.user).aggregate(
+                                total_weighted_grades=Sum(F('grade') * F('credits'), output_field=FloatField()),
+                                total_credits=Sum('credits', output_field=FloatField())
+                                )
+        if average_grade['total_credits']:
+            overall_average = average_grade['total_weighted_grades'] / average_grade['total_credits']
+        else:
+            overall_average = None
         
         for course in courses:
             if course.grades.exists():
@@ -141,6 +159,7 @@ def grades(request, course_slug=None):
 
         return render(request, 'assistant_app/grades.html', {
             'grades_by_course': grades_by_course,
+            'overall_average_grade': overall_average,
             'all_grades_view': True
         })
 
@@ -207,11 +226,14 @@ def assignments(request, course_slug=None):
         course = get_object_or_404(Course, course_slug=course_slug, user=request.user)
         course_assignments_pending = Assignment.objects.filter(course=course, is_done=False)
         course_assignments_completed = Assignment.objects.filter(course=course, is_done=True)
+        due_assignments = Assignment.objects.filter(course=course, is_done=False).count()
+
         return render(request, 'assistant_app/assignments.html', {
             'course_slug': course_slug,
             'course': course,
             'course_assignments_pending': course_assignments_pending,
             'course_assignments_completed': course_assignments_completed,
+            'course_due_assignments': due_assignments,
             'all_assignments_view': False
         })
     
@@ -220,6 +242,7 @@ def assignments(request, course_slug=None):
         assignments_by_course = {}
         completed_assignments = []
         courses = Course.objects.filter(user=request.user)
+        due_assignments = Assignment.objects.filter(course__user=request.user, is_done=False).count()
 
         for course in courses:
             if course.assignments.exists():
@@ -234,6 +257,7 @@ def assignments(request, course_slug=None):
         return render(request, 'assistant_app/assignments.html', {
             'assignments_by_course': assignments_by_course,
             'completed_assignments' : completed_assignments,
+            'overall_due_assignments': due_assignments,
             'all_assignments_view': True
         })
 

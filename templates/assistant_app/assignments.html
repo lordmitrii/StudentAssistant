@@ -12,11 +12,17 @@
         <div class="container-fluid custom-container">
             <!-- Row for buttons -->
             <div class="row mb-3">
-                <div class="col-md-4 text-start">
+                <div class="col-md-5 text-start">
                     <a href="{% url 'assistant_app:add_assignment_for_course' course_slug %}" class="btn btn-secondary">Add Assignment</a>
                 </div>
-                <div class="col-md-4"></div>
-                <div class="col-md-4 text-end">
+                {% if course_due_assignments %}
+                    <div class="col-md-2 text-center custom-outline mt-1 mb-1">
+                        Due Assignments: {{ course_due_assignments }}
+                    </div>
+                {% else %}
+                    <div class="col-md-2"></div>
+                {% endif %}
+                <div class="col-md-5 text-end">
                     <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
                 </div>
             </div>
@@ -118,11 +124,17 @@
         <div class="container-fluid custom-container">
             <!-- Row for buttons -->
             <div class="row mb-3">
-                <div class="col-md-4 text-start">
+                <div class="col-md-5 text-start">
                     <a href="{% url 'assistant_app:add_assignment' %}" class="btn btn-secondary">Add Assignment</a>
                 </div>
-                <div class="col-md-4"></div>
-                <div class="col-md-4 text-end">
+                {% if overall_due_assignments %}
+                    <div class="col-md-2 text-center custom-outline mt-1 mb-1">
+                        Due Assignments: {{ overall_due_assignments }}
+                    </div>
+                {% else %}
+                    <div class="col-md-2"></div>
+                {% endif %}
+                <div class="col-md-5 text-end">
                     <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
                 </div>
             </div>
