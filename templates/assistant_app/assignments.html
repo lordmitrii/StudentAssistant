@@ -23,8 +23,11 @@
                     <div class="col-md-2"></div>
                 {% endif %}
                 <div class="col-md-5 text-end">
+                    <a id="sort-button" href="?order={% if order == 'asc' %}desc{% else %}asc{% endif %}" class="btn btn-primary">
+                        Sort by Deadline {% if order == 'asc' %}↓{% else %}↑{% endif %}
+                    </a>
                     <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
-                </div>
+                </div>               
             </div>
             <!-- Row for accordion -->
             <div class="row justify-content-start">
@@ -43,7 +46,7 @@
                                                     Assignment: {{ assignment.name }}
                                                 </div>
                                                 <div class="col-md-5">
-                                                    Deadline: {{ assignment.deadline|date:"d/m/Y" }}
+                                                    Deadline: {{ assignment.deadline|date:"M d, Y H:i" }}
                                                 </div>
                                             </button>
                                         </h2>
@@ -83,7 +86,7 @@
                                                     Assignment: {{ assignment.name }}
                                                 </div>
                                                 <div class="col-md-5">
-                                                    Deadline: {{ assignment.deadline|date:"d/m/Y" }}
+                                                    Deadline: {{ assignment.deadline|date:"M d, Y H:i" }}
                                                 </div>
                                             </button>
                                         </h2>
@@ -135,6 +138,9 @@
                     <div class="col-md-2"></div>
                 {% endif %}
                 <div class="col-md-5 text-end">
+                    <a id="sort-button" href="?order={% if order == 'asc' %}desc{% else %}asc{% endif %}" class="btn btn-primary">
+                        Sort by Deadline {% if order == 'asc' %}↓{% else %}↑{% endif %}
+                    </a>
                     <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
                 </div>
             </div>
@@ -156,7 +162,7 @@
                                                 Assignment: {{ assignment.name }}
                                             </div>
                                             <div class="col-md-5">
-                                                Deadline: {{ assignment.deadline|date:"d/m/Y" }}
+                                                Deadline: {{ assignment.deadline|date:"M d, Y H:i" }}
                                             </div>
                                         </button>
                                     </h2>
@@ -202,7 +208,7 @@
                                                 Assignment: {{ assignment.name }}
                                             </div>
                                             <div class="col-md-5">
-                                                Deadline: {{ assignment.deadline|date:"d/m/Y" }} 
+                                                Deadline: {{ assignment.deadline|date:"M d, Y H:i" }} 
                                             </div>
                                         </button>
                                     </h2>
@@ -242,6 +248,9 @@
                     </div>
                     <div class="col-md-4"></div>
                     <div class="col-md-4 text-end">
+                        <a id="sort-button" href="?order={% if order == 'asc' %}desc{% else %}asc{% endif %}" class="btn btn-primary">
+                            Sort by Deadline {% if order == 'asc' %}↓{% else %}↑{% endif %}
+                        </a>
                         <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
                     </div>
                 </div>

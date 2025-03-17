@@ -52,4 +52,23 @@ nav a:hover {
     border-radius: 4px;
 }
 
+.card {
+    border-radius: 10px;
+}
 
+.card-header {
+    font-weight: bold;
+}
+
+.tile {
+    min-height: 90px; 
+    display: flex;
+    align-items: center;
+    padding: 15px;
+}
+
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
