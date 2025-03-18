@@ -2,6 +2,8 @@ from django.contrib import admin
 from .models import *
 from .forms import AssignmentAdminForm, GradeAdminForm
 
+
+# Custom admin views for models
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('id', 'course_name', 'user')  
     search_fields = ('course_name', 'user__username') 

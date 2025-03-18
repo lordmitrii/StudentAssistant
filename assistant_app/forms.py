@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from .models import Course, Grade, Assignment
 from django.utils.timezone import now
 
+# Registration form for new users
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True, help_text='Required. Enter a valid email address.')
 
@@ -12,7 +13,7 @@ class RegistrationForm(UserCreationForm):
         fields = ("username", "email", "password1", "password2")
 
 
-
+# Course form for creating and updating courses
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
@@ -28,6 +29,7 @@ class CourseForm(forms.ModelForm):
         }
 
 
+# Grade form for creating and updating grades
 class GradeForm(forms.ModelForm):
     course = forms.ModelChoiceField(queryset=Course.objects.none(), label="Course")
     assignment = forms.ModelChoiceField(queryset=Assignment.objects.none(), required=False, label="Assignment")
@@ -73,6 +75,7 @@ class GradeForm(forms.ModelForm):
             else:
                 self.fields['assignment'].queryset = Assignment.objects.none()
 
+    # Validate that the selected assignment belongs to the selected course
     def clean_assignment(self):
         assignment = self.cleaned_data.get("assignment")
         course = self.cleaned_data.get("course")
@@ -82,7 +85,7 @@ class GradeForm(forms.ModelForm):
         
         return assignment
 
-
+# Assignment form for creating and updating assignments
 class AssignmentForm(forms.ModelForm):
     course = forms.ModelChoiceField(queryset=Course.objects.none(), label="Course")
 
@@ -109,6 +112,7 @@ class AssignmentForm(forms.ModelForm):
             self.fields['course'].widget.attrs.update({'class': 'form-control'})
 
 
+# These fields are used in the admin interface to display the course and assignment names along with the user who created them.
 class CourseChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return f"{obj.course_name} (User: {obj.user.username})"

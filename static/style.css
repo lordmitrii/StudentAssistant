@@ -17,18 +17,6 @@ header {
 
 }
 
-footer {
-    background-color: #000000;
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: white;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-}
-
 nav a {
     color: white;
     text-decoration: none;
