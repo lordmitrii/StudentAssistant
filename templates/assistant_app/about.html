@@ -1,7 +1,98 @@
 {% extends "assistant_app/base.html" %}
+{% load static %}
+
+{% block css_block %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+{% endblock %}
 
 {% block title %}About{% endblock %}
 
 {% block content %}
-    <p>This is a Student Assistant Website</p>
+<div class="container-fluid custom-container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="mb-4">About Student Assistant</h2>
+            <p class="lead">Student Assistant is a comprehensive tool designed to help students manage their academic life efficiently.</p>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title mb-3">Our Project</h3>
+                    <p>Student Assistant aims to simplify academic management by providing tools to track courses, assignments, and grades in one centralized location. We believe that with proper organization, students can reduce stress and improve their academic performance.</p>
+                    
+                    <h4 class="mt-4 mb-3">Key Features</h4>
+                    <ul>
+                        <li>Course management with average grade tracking</li>
+                        <li>Assignment tracking with deadline reminders</li>
+                        <li>Grade recording and GPA calculation</li>
+                        <li>Simple, intuitive interface for ease of use</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="mb-4">The Team</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Team member cards - 4 creators -->
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Team Member 1 Name</h5>
+                    <p class="card-text">GUID: </p>
+                    <p class="card-text">Email: </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Team Member 2 Name</h5>
+                    <p class="card-text">GUID: </p>
+                    <p class="card-text">Email: </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Team Member 3 Name</h5>
+                    <p class="card-text">GUID: </p>
+                    <p class="card-text">Email: </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Team Member 4 Name</h5>
+                    <p class="card-text">GUID: </p>
+                    <p class="card-text">Email: </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title mb-3">How to Use</h3>
+                    <p>Get started by registering an account and adding your courses. From there, you can track assignments, record grades, and monitor your academic progress throughout the semester.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
