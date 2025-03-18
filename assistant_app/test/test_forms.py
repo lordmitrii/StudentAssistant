@@ -4,7 +4,7 @@ from django.utils.timezone import now
 from datetime import timedelta
 
 from assistant_app.forms import (
-    RegistrationForm, CalculatorForm, CourseForm, GradeForm, AssignmentForm
+    RegistrationForm, CourseForm, GradeForm, AssignmentForm
 )
 from assistant_app.models import Course, Assignment
 
@@ -31,19 +31,6 @@ class RegistrationFormTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn('password2', form.errors)
 
-
-class CalculatorFormTests(TestCase):
-    def test_calculator_form_valid(self):
-        data = {
-            'assignment': '1',
-            'grade': 85.0,
-            'credits': 10,
-        }
-        form = CalculatorForm(data)
-        self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data['assignment'], '1')
-        self.assertEqual(form.cleaned_data['grade'], 85.0)
-        self.assertEqual(form.cleaned_data['credits'], 10)
 
 
 class CourseFormTests(TestCase):

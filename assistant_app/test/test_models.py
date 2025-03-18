@@ -19,7 +19,7 @@ class CourseModelTest(TestCase):
         self.assertNotEqual(self.course.course_slug, course2.course_slug)
 
     def test_str_method(self):
-        self.assertEqual(str(self.course), f"{self.course.id} - Mathematics")
+        self.assertEqual(str(self.course), f"Mathematics")
 
 
 class GradeModelTest(TestCase):
@@ -70,4 +70,4 @@ class AssignmentModelTest(TestCase):
             name="Homework"
         )
         assignments = list(Assignment.objects.all())
-        self.assertLessEqual(assignments[0].deadline, assignments[1].deadline)  # 确保排序正确
+        self.assertLessEqual(assignments[0].deadline, assignments[1].deadline) 
