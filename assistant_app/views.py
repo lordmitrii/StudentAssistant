@@ -1,17 +1,36 @@
 from django.shortcuts import get_object_or_404, render
-from django.db.models import Sum, F, ExpressionWrapper, FloatField, Count, Q
+from django.db.models import Sum, F, ExpressionWrapper, FloatField, Count, Q, Avg
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
-from .forms import RegistrationForm, CalculatorForm, CourseForm, GradeForm, AssignmentForm
+from .forms import RegistrationForm, CourseForm, GradeForm, AssignmentForm
 from django.contrib.auth.decorators import login_required
-from .models import Course, Grade, Assignment
+from .models import Course, Grade, Assignment, News
+from django.utils.timezone import now
 
 def home(request):
-    context_dict = {"title": "Welcome to the Student Assistant App",
-                    "message": "Hello, world!",}
-    
-    return render(request, "assistant_app/home.html", context=context_dict)
+    context_dict = {
+        "title": "Welcome to the Student Assistant App",
+        "message": "Hello, world!",
+    }
+
+    if request.user.is_authenticated:
+        upcoming_deadlines = Assignment.objects.filter(course__user=request.user, is_done=False).order_by('deadline')[:5]
+        recent_grades = Grade.objects.filter(course__user=request.user).order_by('-date')[:5]
+        latest_news = News.objects.filter(is_published=True).order_by('-date_posted')[:3]  # Fetch latest 3 news items
+
+        # Remaining days for deadlines
+        for deadline in upcoming_deadlines:
+            deadline.remaining_days = (deadline.deadline - now()).days 
+
+        context_dict.update({
+            "upcoming_deadlines": upcoming_deadlines,
+            "recent_grades": recent_grades,
+            "latest_news": latest_news
+        })
+
+    return render(request, "assistant_app/home.html", context_dict)
+
 
 def about(request):
     return render(request, "assistant_app/about.html")
@@ -50,21 +69,11 @@ def account_view(request):
     return render(request, 'assistant_app/account.html')
    
 def calculator(request):
-    if request.method == 'POST':
-        form = CalculatorForm(request.POST)
-        if form.is_valid():
-            assignment = form.cleaned_data['assignment']
-            grade = form.cleaned_data['grade']
-            credits = form.cleaned_data['credits']
-            result = grade * credits
-        return render(request, 'assistant_app/calculator.html', {'form': form, 'result': result})
-    else:
-        form = CalculatorForm()
-    return render(request, 'assistant_app/calculator.html', {'form': form})
+    return render(request, 'assistant_app/calculator.html')
 
 @login_required
 def courses(request):
-    # Query to get all courses for the logged-in user and calculate the average grade using weights
+    # Query to get all courses for the user and calculate the average grade using weights
     courses = Course.objects.filter(user=request.user).annotate(
         total_weighted_grades=Sum(F('grades__grade') * F('grades__credits'), output_field=FloatField()),
         total_credits=Sum('grades__credits', output_field=FloatField()),
@@ -118,10 +127,20 @@ def grades(request, course_slug=None):
     if course_slug:
         course = get_object_or_404(Course, course_slug=course_slug, user=request.user)
         course_grades = Grade.objects.filter(course=course)
+        average_grade = course_grades.aggregate(
+            total_weighted_grades=Sum(F('grade') * F('credits'), output_field=FloatField()),
+            total_credits=Sum('credits', output_field=FloatField())
+        )
+        if average_grade['total_credits']:
+            course_average = average_grade['total_weighted_grades'] / average_grade['total_credits']
+        else:
+            course_average = None
+
         return render(request, 'assistant_app/grades.html', {
             'course_slug': course_slug,
             'course': course,
             'course_grades': course_grades,
+            'course_average_grade': course_average,
             'all_grades_view': False
         })
     
@@ -129,6 +148,14 @@ def grades(request, course_slug=None):
         grades_exist = False
         grades_by_course = {}
         courses = Course.objects.filter(user=request.user)
+        average_grade = Grade.objects.filter(course__user=request.user).aggregate(
+                                total_weighted_grades=Sum(F('grade') * F('credits'), output_field=FloatField()),
+                                total_credits=Sum('credits', output_field=FloatField())
+                                )
+        if average_grade['total_credits']:
+            overall_average = average_grade['total_weighted_grades'] / average_grade['total_credits']
+        else:
+            overall_average = None
         
         for course in courses:
             if course.grades.exists():
@@ -141,6 +168,7 @@ def grades(request, course_slug=None):
 
         return render(request, 'assistant_app/grades.html', {
             'grades_by_course': grades_by_course,
+            'overall_average_grade': overall_average,
             'all_grades_view': True
         })
 
@@ -203,16 +231,23 @@ def delete_grade(request, grade_id, course_slug=None):
 
 @login_required
 def assignments(request, course_slug=None):
+    order = request.GET.get('order', 'asc')
+    sorting_order = 'deadline' if order == 'asc' else '-deadline'
+
     if course_slug:
         course = get_object_or_404(Course, course_slug=course_slug, user=request.user)
-        course_assignments_pending = Assignment.objects.filter(course=course, is_done=False)
-        course_assignments_completed = Assignment.objects.filter(course=course, is_done=True)
+        course_assignments_pending = Assignment.objects.filter(course=course, is_done=False).order_by(sorting_order)
+        course_assignments_completed = Assignment.objects.filter(course=course, is_done=True).order_by(sorting_order)
+        due_assignments = course_assignments_pending.count()
+
         return render(request, 'assistant_app/assignments.html', {
             'course_slug': course_slug,
             'course': course,
             'course_assignments_pending': course_assignments_pending,
             'course_assignments_completed': course_assignments_completed,
-            'all_assignments_view': False
+            'course_due_assignments': due_assignments,
+            'all_assignments_view': False,
+            'order': order
         })
     
     else:
@@ -220,6 +255,8 @@ def assignments(request, course_slug=None):
         assignments_by_course = {}
         completed_assignments = []
         courses = Course.objects.filter(user=request.user)
+        completed_assignments = Assignment.objects.filter(course__user=request.user, is_done=True).order_by(sorting_order)
+        due_assignments_count = Assignment.objects.filter(course__user=request.user, is_done=False).count()
 
         for course in courses:
             if course.assignments.exists():
@@ -228,13 +265,14 @@ def assignments(request, course_slug=None):
         
         if assignments_exists:
             for course in courses:
-                assignments_by_course[course] = Assignment.objects.filter(course=course, is_done=False)
-                completed_assignments.extend(Assignment.objects.filter(course=course, is_done=True))
+                assignments_by_course[course] = Assignment.objects.filter(course=course, is_done=False).order_by(sorting_order)
 
         return render(request, 'assistant_app/assignments.html', {
             'assignments_by_course': assignments_by_course,
             'completed_assignments' : completed_assignments,
-            'all_assignments_view': True
+            'overall_due_assignments': due_assignments_count,
+            'all_assignments_view': True,
+            'order': order
         })
 
 @login_required
