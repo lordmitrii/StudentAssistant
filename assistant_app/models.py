@@ -15,6 +15,8 @@ class Course(models.Model):
     class Meta:
         unique_together = ('user', 'course_slug')  # Slug uniqueness per user
 
+
+    # Override the save method to generate a unique slug for each course based on the course name.
     def save(self, *args, **kwargs):
         if not self.course_slug:
             base_slug = slugify(self.course_name)

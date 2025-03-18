@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render
-from django.db.models import Sum, F, ExpressionWrapper, FloatField, Count, Q, Avg
-from django.http import HttpResponse, JsonResponse
+from django.db.models import Sum, F, ExpressionWrapper, FloatField, Count, Q
+from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from .forms import RegistrationForm, CourseForm, GradeForm, AssignmentForm
@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Course, Grade, Assignment, News
 from django.utils.timezone import now
 
+# Home view for the application
 def home(request):
     context_dict = {
         "title": "Welcome to the Student Assistant App",
@@ -32,10 +33,12 @@ def home(request):
     return render(request, "assistant_app/home.html", context_dict)
 
 
+# About view for the application
 def about(request):
     return render(request, "assistant_app/about.html")
 
 
+# Login and registration views
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -64,13 +67,16 @@ def logout_view(request):
     logout(request)
     return redirect('assistant_app:login')
 
+# Account view for the application
 @login_required
 def account_view(request):
     return render(request, 'assistant_app/account.html')
-   
+
+# Calculator view for the application
 def calculator(request):
     return render(request, 'assistant_app/calculator.html')
 
+# Course management views
 @login_required
 def courses(request):
     # Query to get all courses for the user and calculate the average grade using weights
@@ -84,6 +90,7 @@ def courses(request):
 
     return render(request, 'assistant_app/courses.html', {'courses': courses})
 
+# Add and edit course views
 @login_required
 def add_course(request):
     if request.method == 'POST':
@@ -122,8 +129,10 @@ def delete_course(request, course_slug):
     return redirect('assistant_app:courses')
 
 
+# Grade management views
 @login_required
 def grades(request, course_slug=None):
+    # If a course slug is provided, filter grades for that specific course
     if course_slug:
         course = get_object_or_404(Course, course_slug=course_slug, user=request.user)
         course_grades = Grade.objects.filter(course=course)
@@ -136,6 +145,7 @@ def grades(request, course_slug=None):
         else:
             course_average = None
 
+        # Render the template with course-specific grades
         return render(request, 'assistant_app/grades.html', {
             'course_slug': course_slug,
             'course': course,
@@ -144,6 +154,7 @@ def grades(request, course_slug=None):
             'all_grades_view': False
         })
     
+    # If no course slug is provided, show all grades for the user
     else:
         grades_exist = False
         grades_by_course = {}
@@ -157,6 +168,7 @@ def grades(request, course_slug=None):
         else:
             overall_average = None
         
+        # Check if any course has grades and prepare the data for rendering
         for course in courses:
             if course.grades.exists():
                 grades_exist = True
@@ -229,17 +241,22 @@ def delete_grade(request, grade_id, course_slug=None):
     else:
         return redirect('assistant_app:all_grades')
 
+
+# Assignment management views
 @login_required
 def assignments(request, course_slug=None):
+    ## Get the sorting order from the request, default to ascending order
     order = request.GET.get('order', 'asc')
     sorting_order = 'deadline' if order == 'asc' else '-deadline'
 
+    ## If a course slug is provided, filter assignments for that specific course
     if course_slug:
         course = get_object_or_404(Course, course_slug=course_slug, user=request.user)
         course_assignments_pending = Assignment.objects.filter(course=course, is_done=False).order_by(sorting_order)
         course_assignments_completed = Assignment.objects.filter(course=course, is_done=True).order_by(sorting_order)
         due_assignments = course_assignments_pending.count()
 
+        # Render the template with course-specific assignments
         return render(request, 'assistant_app/assignments.html', {
             'course_slug': course_slug,
             'course': course,
@@ -250,6 +267,7 @@ def assignments(request, course_slug=None):
             'order': order
         })
     
+    # If no course slug is provided, show all assignments for the user
     else:
         assignments_exists = False
         assignments_by_course = {}
@@ -258,6 +276,7 @@ def assignments(request, course_slug=None):
         completed_assignments = Assignment.objects.filter(course__user=request.user, is_done=True).order_by(sorting_order)
         due_assignments_count = Assignment.objects.filter(course__user=request.user, is_done=False).count()
 
+        # Check if any course has assignments and prepare the data for rendering
         for course in courses:
             if course.assignments.exists():
                 assignments_exists = True
@@ -327,7 +346,8 @@ def delete_assignment(request, assignment_id, course_slug=None):
         return redirect('assistant_app:assignments_for_course', course_slug=course_slug)
     else:
         return redirect('assistant_app:all_assignments')
-    
+
+# AJAX helpers for assignments
 @login_required
 def get_assignments(request):
     course_id = request.GET.get('course_id')
