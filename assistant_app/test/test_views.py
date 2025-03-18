@@ -40,7 +40,6 @@ def test_login_view_post_success(client):
 def test_login_view_post_failure(client):
     url = reverse('assistant_app:login')
     response = client.post(url, {'username': 'nonexistent', 'password': 'wrong'})
-    # 无效凭据时返回原页面并显示错误信息
     assert response.status_code == 200
     assert b"Invalid credentials" in response.content
 
@@ -59,7 +58,7 @@ def test_register_view_post(client):
         'password2': 'StrongPass123'
     }
     response = client.post(url, data)
-    assert response.status_code == 302  # 注册成功后重定向
+    assert response.status_code == 302 
     assert User.objects.filter(username='newuser').exists()
 
 @pytest.mark.django_db
@@ -105,7 +104,6 @@ def test_courses_view(client):
     assert response.status_code == 200
     assert b"Mathematics" in response.content
 
-# 测试添加课程
 @pytest.mark.django_db
 def test_add_course_view(client):
     user = User.objects.create_user(username="testuser", password="password")
@@ -116,20 +114,18 @@ def test_add_course_view(client):
     assert response.status_code == 302
     assert Course.objects.filter(course_name='Physics').exists()
 
-# 测试编辑课程
 @pytest.mark.django_db
 def test_edit_course_view(client):
     user = User.objects.create_user(username="testuser", password="password")
     client.login(username="testuser", password="password")
     course = Course.objects.create(user=user, course_name="Chemistry")
     url = reverse('assistant_app:edit_course', args=[course.course_slug])
-    data = {'course_name': 'Organic Chemistry'}  # 修改课程名称
+    data = {'course_name': 'Organic Chemistry'}  
     response = client.post(url, data)
     assert response.status_code == 302
     course.refresh_from_db()
     assert course.course_name == 'Organic Chemistry'
 
-# 测试删除课程
 @pytest.mark.django_db
 def test_delete_course_view(client):
     user = User.objects.create_user(username="testuser", password="password")
@@ -274,7 +270,6 @@ def test_get_assignments_view(client):
     user = User.objects.create_user(username="testuser", password="password")
     client.login(username="testuser", password="password")
     course = Course.objects.create(user=user, course_name="History")
-    # 创建一个 graded=True 且 grade 为 None 的作业
     Assignment.objects.create(course=course, name="Term Paper", graded=True, is_done=False)
     url = reverse('assistant_app:get_assignments')
     response = client.get(url, {'course_id': course.id})
