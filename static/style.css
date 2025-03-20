@@ -17,20 +17,6 @@ header {
 
 }
 
-nav a {
-    color: white;
-    text-decoration: none;
-    padding: 10px 15px;
-    border: 1px solid white;
-    border-radius: 4px;
-    margin-left: 10px;
-    transition: background-color 0.3s, color 0.3s;
-}
-nav a:hover {
-    background-color: white;
-    color: black;
-}
-
 .custom-container {
     margin-top: 20px;
 }
@@ -38,14 +24,6 @@ nav a:hover {
 .custom-outline {
     border: 1px solid #000000;
     border-radius: 4px;
-}
-
-.card {
-    border-radius: 10px;
-}
-
-.card-header {
-    font-weight: bold;
 }
 
 .tile {
@@ -62,6 +40,21 @@ nav a:hover {
 }
 
 /* Navigation Bar */
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    border: 1px solid white;
+    border-radius: 4px;
+    margin-left: 10px;
+    transition: background-color 0.3s, color 0.3s;
+}
+nav a:hover {
+    background-color: white;
+    color: black;
+}
+
 .navbar {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -109,15 +102,6 @@ nav a:hover {
 
 .btn-secondary:hover {
     background-color: #5a6268;
-}
-
-.btn-light.custom-outline {
-    border: 1px solid #dee2e6;
-}
-
-.btn-light.custom-outline:hover {
-    background-color: #f8f9fa;
-    border-color: #6c757d;
 }
 
 /* Responsive Design */
