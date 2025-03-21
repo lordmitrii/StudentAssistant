@@ -20,8 +20,11 @@ from django.urls import path
 from django.urls.conf import include
 from django.conf.urls.static import static
 from django.conf import settings
+from django.shortcuts import redirect
 
 urlpatterns = [
     path("", include("assistant_app.urls")),
     path("admin/", admin.site.urls),
+    path("accounts/", include("allauth.urls")),
+    path('google/login/', lambda request: redirect('/accounts/google/login/'), name='google_login'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
