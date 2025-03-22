@@ -8,7 +8,7 @@
 {% block title %}Courses{% endblock %}
 
 {% block content %}
-  <div class="container-fluid custom-container">
+  <div class="container mt-4">
     <!-- Row for buttons -->
     <div class="row mb-3">
       <!-- Add Course button -->
@@ -29,8 +29,8 @@
       {% if courses %}
         {% for course in courses %}
           <div class="col-md-12 mb-3">
-            <div class="card">
-              <div class="card-header">
+            <div class="card shadow">
+              <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">{{ course.course_name }}</h5>
               </div>
               <div class="card-body ">

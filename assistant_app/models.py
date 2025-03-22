@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User # use the built-in User model for authentication
 from django.utils.text import slugify
-
+from django.utils.timezone import now
 
 class Course(models.Model):
     """
@@ -15,6 +15,8 @@ class Course(models.Model):
     class Meta:
         unique_together = ('user', 'course_slug')  # Slug uniqueness per user
 
+
+    # Override the save method to generate a unique slug for each course based on the course name.
     def save(self, *args, **kwargs):
         if not self.course_slug:
             base_slug = slugify(self.course_name)
@@ -27,7 +29,7 @@ class Course(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.id} - {self.course_name}"
+        return f"{self.course_name}"
     
 
 
@@ -65,3 +67,20 @@ class Assignment(models.Model):
     
     class Meta:
         ordering = ['deadline']
+
+
+class News(models.Model):
+    """
+    News model for displaying updates on the dashboard.
+    """
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    date_posted = models.DateTimeField(default=now)
+    is_published = models.BooleanField(default=True)  
+
+    class Meta:
+        ordering = ['-date_posted'] 
+        verbose_name_plural = "News"
+
+    def __str__(self):
+        return self.title

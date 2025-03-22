@@ -9,14 +9,20 @@
 
 {% block content %}
     {% if not all_grades_view %}
-        <div class="container-fluid custom-container">
+        <div class="container mt-4">
             <!-- Row for buttons -->
             <div class="row mb-3">
-                <div class="col-md-4 text-start">
+                <div class="col-md-5 text-start">
                     <a href="{% url 'assistant_app:add_grade_for_course' course_slug %}" class="btn btn-secondary">Add Grade</a>
                 </div>
-                <div class="col-md-4"></div>
-                <div class="col-md-4 text-end">
+                {% if course_average_grade %}
+                    <div class="col-md-2 text-center custom-outline mt-1 mb-1">
+                        Average grade: {{ course_average_grade|floatformat:2 }}
+                    </div>
+                {% else %}
+                    <div class="col-md-2 text-center"></div>
+                {% endif %}
+                <div class="col-md-5 text-end">
                     <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
                 </div>
             </div>
@@ -60,14 +66,20 @@
     {% else %}
         
         {% if grades_by_course %}
-        <div class="container-fluid custom-container">
+        <div class="container mt-4">
             <!-- Row for buttons -->
             <div class="row mb-3">
-                <div class="col-md-4 text-start">
+                <div class="col-md-5 text-start">
                     <a href="{% url 'assistant_app:add_grade' %}" class="btn btn-secondary">Add Grade</a>
                 </div>
-                <div class="col-md-4"></div>
-                <div class="col-md-4 text-end">
+                {% if overall_average_grade %}
+                    <div class="col-md-2 text-center custom-outline mt-1 mb-1">
+                        Average grade: {{ overall_average_grade|floatformat:2 }}
+                    </div>
+                {% else %}
+                    <div class="col-md-2 text-center"></div>
+                {% endif %}
+                <div class="col-md-5 text-end">
                     <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
                 </div>
             </div>
@@ -112,7 +124,7 @@
                     {% endif %}
                 {% endfor %}
             {% else %}
-            <div class="container-fluid custom-container">
+            <div class="container mt-4">
                 <!-- Row for buttons -->
                 <div class="row mb-3">
                     <div class="col-md-4 text-start">

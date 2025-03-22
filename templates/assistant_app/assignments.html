@@ -9,16 +9,25 @@
 
 {% block content %}
     {% if not all_assignments_view %}
-        <div class="container-fluid custom-container">
+        <div class="container mt-4">
             <!-- Row for buttons -->
             <div class="row mb-3">
-                <div class="col-md-4 text-start">
+                <div class="col-md-5 text-start">
                     <a href="{% url 'assistant_app:add_assignment_for_course' course_slug %}" class="btn btn-secondary">Add Assignment</a>
                 </div>
-                <div class="col-md-4"></div>
-                <div class="col-md-4 text-end">
+                {% if course_due_assignments %}
+                    <div class="col-md-2 text-center custom-outline mt-1 mb-1">
+                        Due Assignments: {{ course_due_assignments }}
+                    </div>
+                {% else %}
+                    <div class="col-md-2"></div>
+                {% endif %}
+                <div class="col-md-5 text-end">
+                    <a id="sort-button" href="?order={% if order == 'asc' %}desc{% else %}asc{% endif %}" class="btn btn-primary">
+                        Sort by Deadline {% if order == 'asc' %}↓{% else %}↑{% endif %}
+                    </a>
                     <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
-                </div>
+                </div>               
             </div>
             <!-- Row for accordion -->
             <div class="row justify-content-start">
@@ -37,7 +46,7 @@
                                                     Assignment: {{ assignment.name }}
                                                 </div>
                                                 <div class="col-md-5">
-                                                    Deadline: {{ assignment.deadline|date:"d/m/Y" }}
+                                                    Deadline: {{ assignment.deadline|date:"M d, Y H:i" }}
                                                 </div>
                                             </button>
                                         </h2>
@@ -77,7 +86,7 @@
                                                     Assignment: {{ assignment.name }}
                                                 </div>
                                                 <div class="col-md-5">
-                                                    Deadline: {{ assignment.deadline|date:"d/m/Y" }}
+                                                    Deadline: {{ assignment.deadline|date:"M d, Y H:i" }}
                                                 </div>
                                             </button>
                                         </h2>
@@ -115,14 +124,23 @@
         </div>
     {% else %}
         {% if assignments_by_course %}
-        <div class="container-fluid custom-container">
+        <div class="container mt-4">
             <!-- Row for buttons -->
             <div class="row mb-3">
-                <div class="col-md-4 text-start">
+                <div class="col-md-5 text-start">
                     <a href="{% url 'assistant_app:add_assignment' %}" class="btn btn-secondary">Add Assignment</a>
                 </div>
-                <div class="col-md-4"></div>
-                <div class="col-md-4 text-end">
+                {% if overall_due_assignments %}
+                    <div class="col-md-2 text-center custom-outline mt-1 mb-1">
+                        Due Assignments: {{ overall_due_assignments }}
+                    </div>
+                {% else %}
+                    <div class="col-md-2"></div>
+                {% endif %}
+                <div class="col-md-5 text-end">
+                    <a id="sort-button" href="?order={% if order == 'asc' %}desc{% else %}asc{% endif %}" class="btn btn-primary">
+                        Sort by Deadline {% if order == 'asc' %}↓{% else %}↑{% endif %}
+                    </a>
                     <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
                 </div>
             </div>
@@ -144,7 +162,7 @@
                                                 Assignment: {{ assignment.name }}
                                             </div>
                                             <div class="col-md-5">
-                                                Deadline: {{ assignment.deadline|date:"d/m/Y" }}
+                                                Deadline: {{ assignment.deadline|date:"M d, Y H:i" }}
                                             </div>
                                         </button>
                                     </h2>
@@ -190,7 +208,7 @@
                                                 Assignment: {{ assignment.name }}
                                             </div>
                                             <div class="col-md-5">
-                                                Deadline: {{ assignment.deadline|date:"d/m/Y" }} 
+                                                Deadline: {{ assignment.deadline|date:"M d, Y H:i" }} 
                                             </div>
                                         </button>
                                     </h2>
@@ -222,7 +240,7 @@
                 </div>
                 {% endif %}
         {% else %}
-            <div class="container-fluid custom-container">
+            <div class="container mt-4">
                 <!-- Row for buttons -->
                 <div class="row mb-3">
                     <div class="col-md-4 text-start">
@@ -230,6 +248,9 @@
                     </div>
                     <div class="col-md-4"></div>
                     <div class="col-md-4 text-end">
+                        <a id="sort-button" href="?order={% if order == 'asc' %}desc{% else %}asc{% endif %}" class="btn btn-primary">
+                            Sort by Deadline {% if order == 'asc' %}↓{% else %}↑{% endif %}
+                        </a>
                         <a href="{% url 'assistant_app:courses' %}" class="btn btn-secondary custom-outline me-4">Back to Courses</a>
                     </div>
                 </div>

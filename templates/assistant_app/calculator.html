@@ -1,16 +1,41 @@
 {% extends "assistant_app/base.html" %}
+{% load static %}
 
-{% block title %}Calculator{% endblock %}
+{% block title %}Grade Calculator{% endblock %}
 
 {% block content %}
   <div class="container mt-5">
-    <div class="col-md-auto">
-      <form method="post">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <button type="submit" class="btn btn-primary">Save Grade</button>
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white">
+          <h2 class="mb-0">Grade Calculator</h2>
+      </div>
+      <div class="card-body">
+      <form id="calculator-form">
+          <table class="table table-hover" id="grades-table">
+              <thead class ="thead-light">
+                  <tr>
+                      <th>Name</th>
+                      <th>Grade (%)</th>
+                      <th>Credits (Weight)</th>
+                      <th></th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr class="grade-row">
+                    <td><input type="text" class="form-control" name="assignment[]" placeholder="Enter assignment name" required></td>
+                    <td><input type="number" class="form-control grade" name="grade[]" min="0" max="100" placeholder="Enter grade" required></td>
+                    <td><input type="number" class="form-control credit" name="credits[]" min="1" placeholder="Enter credits" required></td>
+                    <td><button type="button" class="btn btn-danger remove-row">&times;</button></td>
+                  </tr>
+              </tbody>
+          </table>
+          <button type="button" id="add-row" class="btn btn-secondary">Add Row</button>
+          <button type="submit" class="btn btn-primary">Calculate</button>
       </form>
-      <p class="font-weight-bolder">Result: {{ result }}</p>
-    </div>
+      <h4 class="mt-4">Average Grade: <span id="average-grade">-</span></h4>
   </div>
+{% endblock %}
+
+{% block js_block %}
+  <script src="{% static 'js/calculator.js' %}"></script>
 {% endblock %}

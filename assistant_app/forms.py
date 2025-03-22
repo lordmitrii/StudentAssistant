@@ -2,7 +2,9 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Course, Grade, Assignment
+from django.utils.timezone import now
 
+# Registration form for new users
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True, help_text='Required. Enter a valid email address.')
 
@@ -11,26 +13,7 @@ class RegistrationForm(UserCreationForm):
         fields = ("username", "email", "password1", "password2")
 
 
-class CalculatorForm(forms.Form):
-    #Chooices of assignments:
-    ASSIGNMENT_CHOICES = (
-        ('1', 'Assignment 1'),
-        ('2', 'Assignment 2'),
-        ('3', 'Assignment 3'),
-        ('4', 'Assignment 4'),
-        ('5', 'Assignment 5'),
-    )
-    assignment = forms.ChoiceField(choices=ASSIGNMENT_CHOICES, label='Assignment')
-    grade = forms.FloatField(label='Grade')
-    credits = forms.IntegerField(label='Credits', initial=10)
-    
-    class Meta:
-        fields = ("assignment", "grade", "credits")
-        widgets = {
-            'grade': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter grade in percentage', 'min': 0, 'max': 100}),
-            'credits': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter credits'}),
-        }
-
+# Course form for creating and updating courses
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
@@ -46,6 +29,7 @@ class CourseForm(forms.ModelForm):
         }
 
 
+# Grade form for creating and updating grades
 class GradeForm(forms.ModelForm):
     course = forms.ModelChoiceField(queryset=Course.objects.none(), label="Course")
     assignment = forms.ModelChoiceField(queryset=Assignment.objects.none(), required=False, label="Assignment")
@@ -54,8 +38,8 @@ class GradeForm(forms.ModelForm):
         model = Grade
         fields = ['course', 'assignment', 'grade', 'credits', 'date', 'note']
         widgets = {
-            'date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
-            'note': forms.TextInput(attrs={'class': 'form-control'}),
+            'date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'),
+            'note': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add any relevant notes'}),
             'grade': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter grades in percentage', 'min': 0, 'max': 100}),
             'credits': forms.NumberInput(attrs={'class': 'form-control'}),
         }
@@ -64,7 +48,9 @@ class GradeForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         course_slug = kwargs.pop('course_slug', None)
         super().__init__(*args, **kwargs)
-
+        
+        self.fields['date'].initial = now()
+        
         # If a course is provided, hide the course field
         if course_slug:
             course = Course.objects.get(course_slug=course_slug, user=user)
@@ -89,6 +75,7 @@ class GradeForm(forms.ModelForm):
             else:
                 self.fields['assignment'].queryset = Assignment.objects.none()
 
+    # Validate that the selected assignment belongs to the selected course
     def clean_assignment(self):
         assignment = self.cleaned_data.get("assignment")
         course = self.cleaned_data.get("course")
@@ -98,7 +85,7 @@ class GradeForm(forms.ModelForm):
         
         return assignment
 
-
+# Assignment form for creating and updating assignments
 class AssignmentForm(forms.ModelForm):
     course = forms.ModelChoiceField(queryset=Course.objects.none(), label="Course")
 
@@ -108,8 +95,8 @@ class AssignmentForm(forms.ModelForm):
         widgets = {
             'deadline': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'graded': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'note': forms.TextInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter assignment name'}),
+            'note': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add any relevant notes'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -125,5 +112,29 @@ class AssignmentForm(forms.ModelForm):
             self.fields['course'].widget.attrs.update({'class': 'form-control'})
 
 
+# These fields are used in the admin interface to display the course and assignment names along with the user who created them.
+class CourseChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return f"{obj.course_name} (User: {obj.user.username})"
 
+class AssignmentChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return f"{obj.name} - {obj.course.course_name} (User: {obj.course.user.username})"
 
+class GradeChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return f"Grade: {obj.grade} ({obj.course.course_name} - {obj.course.user.username})"
+
+class AssignmentAdminForm(forms.ModelForm):
+    course = CourseChoiceField(queryset=Course.objects.all())
+
+    class Meta:
+        model = Assignment
+        fields = '__all__'
+
+class GradeAdminForm(forms.ModelForm):
+    course = CourseChoiceField(queryset=Course.objects.all())
+
+    class Meta:
+        model = Grade
+        fields = '__all__'
