@@ -11,7 +11,7 @@
       <div class="card border-0 shadow">
         <div class="card-body text-center">
           <div class="mb-4">
-            <div class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center" style="width: 100px; height: 100px; font-size: 2.5rem;">
+            <div class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center profile-icon">
               {{ user.username|slice:":1"|upper }}
             </div>
           </div>
@@ -77,8 +77,8 @@
         <div class="col-md-6 mb-4">
           <div class="card shadow-lg h-100">
             <div class="card-body text-center">
-              <div class="rounded-circle bg-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                <i class="bi bi-book text-white" style="font-size: 2rem;"></i>
+              <div class="rounded-circle bg-primary mx-auto mb-3 d-flex align-items-center justify-content-center account-icon">
+                <i class="bi bi-book text-white"></i>
               </div>
               <h5>My Courses</h5>
               <p class="text-muted">View and manage your courses</p>
@@ -95,8 +95,8 @@
         <div class="col-md-6 mb-4">
           <div class="card shadow-lg h-100">
             <div class="card-body text-center">
-              <div class="rounded-circle bg-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                <i class="bi bi-clipboard-check text-white" style="font-size: 2rem;"></i>
+              <div class="rounded-circle bg-primary mx-auto mb-3 d-flex align-items-center justify-content-center account-icon">
+                <i class="bi bi-clipboard-check text-white"></i>
               </div>
               <h5>Assignments</h5>
               <p class="text-muted">Track your upcoming deadlines</p>
@@ -113,13 +113,13 @@
       <!--- Grades Card --->
       <div class="card shadow-lg mb-4">
         <div class="card-body text-center">
-          <div class="rounded-circle bg-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-            <i class="bi bi-mortarboard text-white" style="font-size: 2rem;"></i>
+          <div class="rounded-circle bg-primary mx-auto mb-3 d-flex align-items-center justify-content-center account-icon">
+            <i class="bi bi-mortarboard text-white"></i>
           </div>
           <h5>Grades Overview</h5>
           <p class="text-muted">Check your academic performance and GPA</p>
           <div class="d-grid">
-            <a href="{% url 'assistant_app:courses' %}" class="btn btn-primary">
+            <a href="{% url 'assistant_app:all_grades' %}" class="btn btn-primary">
               View Grades <i class="bi bi-arrow-right ms-2"></i>
             </a>
           </div>
