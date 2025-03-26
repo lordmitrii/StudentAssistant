@@ -26,9 +26,9 @@
                                             </small>
                                         </div>
 
-                                        {% if deadline.remaining_days <= 1 %}
+                                        {% if deadline.remaining_days < 1 %}
                                             <span class="badge bg-danger">{{ deadline.deadline|date:"M d, Y H:i" }}</span>
-                                        {% elif deadline.remaining_days <= 7 %}
+                                        {% elif deadline.remaining_days < 7 %}
                                             <span class="badge bg-warning">{{ deadline.deadline|date:"M d, Y H:i" }}</span>
                                         {% else %}
                                             <span class="badge bg-success">{{ deadline.deadline|date:"M d, Y H:i" }}</span>
