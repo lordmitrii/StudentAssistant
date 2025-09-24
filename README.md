@@ -1,4 +1,4 @@
-# Student Assistnat 
+# Student Assistant 
 
 ## Project Description
 The Student Assistant is a web application designed to help students track academic deadlines 
